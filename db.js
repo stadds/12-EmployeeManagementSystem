@@ -23,10 +23,20 @@ async function getAllEmployeeData(){
 
         let results = await promisePool.query(query);
         console.table(results[0]);   
-        pool.end();
     } catch (error) {
         console.log(error);
     }
 }
 
-getAllEmployeeData();
+function closeDB(){
+    pool.end();
+}
+
+async function init(){
+    await getAllEmployeeData();
+    closeDB();
+}
+
+// init();
+
+module.exports = {getAllEmployeeData,closeDB};
