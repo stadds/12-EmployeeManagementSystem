@@ -22,10 +22,15 @@ async function getAllEmployeeData(){
         query += 'ORDER BY emp.id';
 
         let results = await promisePool.query(query);
-        console.table(results[0]);   
+       // console.table(results[0]);   
+        return results[0];
     } catch (error) {
         console.log(error);
     }
+}
+
+async function getAllDepartments(){
+
 }
 
 function closeDB(){

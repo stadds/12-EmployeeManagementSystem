@@ -61,7 +61,8 @@ async function getUserInput() {
                     myDB.closeDB();
                     break;
                 case ("viewEmp"):
-                    await myDB.getAllEmployeeData();
+                    const allEmps = await myDB.getAllEmployeeData();
+                    console.table(allEmps);
                     break;
                 default:
                     console.log(getAction.actionitem);
