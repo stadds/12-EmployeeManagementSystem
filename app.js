@@ -60,6 +60,10 @@ async function getUserInput() {
                     keepGoing = false;
                     myDB.closeDB();
                     break;
+                case ("viewDept"):
+                    const allDepts = await myDB.getAllDepartments();
+                    console.table(allDepts);
+                    break;
                 case ("viewEmp"):
                     const allEmps = await myDB.getAllEmployeeData();
                     console.table(allEmps);

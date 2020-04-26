@@ -30,7 +30,15 @@ async function getAllEmployeeData(){
 }
 
 async function getAllDepartments(){
-
+    try {
+        
+        let query = 'SELECT * FROM department';
+        let results = await promisePool.query(query);
+        return results[0];
+    } catch (error) {
+        console.log(error);
+        
+    }
 }
 
 function closeDB(){
@@ -44,4 +52,4 @@ async function init(){
 
 // init();
 
-module.exports = {getAllEmployeeData,closeDB};
+module.exports = {getAllEmployeeData,getAllDepartments,closeDB};
