@@ -34,6 +34,19 @@ async function getAllEmployeeData(){
     }
 }
 
+async function getEmployeeList(){
+    try {
+        let query = 'SELECT DISTINCT id, concat(first_name, " ", last_name) as Employee, role_id ';
+        query += 'FROM employee ORDER BY id';
+
+        let results = await promisePool.query(query);
+        return results[0];
+    } catch (error) {
+        console.log(error);
+        
+    }
+}
+
 // DEPARTMENT QUERIES
 // =============================================================
 async function getAllDepartments(){
