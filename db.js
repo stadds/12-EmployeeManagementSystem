@@ -4,6 +4,9 @@ const mysql = require("mysql2");
 
 require('dotenv').config();
 
+// SET UP POOL CONNECTION
+// =============================================================
+
 const pool = mysql.createPool({
     host: process.env.MYSQL_HOST,
     port: process.env.MYSQL_PORT,
@@ -14,6 +17,8 @@ const pool = mysql.createPool({
 
 const promisePool = pool.promise();
 
+// EMPLOYEE QUERIES
+// =============================================================
 async function getAllEmployeeData(){
     try {
 
@@ -29,6 +34,8 @@ async function getAllEmployeeData(){
     }
 }
 
+// DEPARTMENT QUERIES
+// =============================================================
 async function getAllDepartments(){
     try {
         
@@ -40,6 +47,24 @@ async function getAllDepartments(){
         
     }
 }
+
+
+async function insertNewDept(newDept){
+    try {
+
+        let query = `INSERT INTO department SET ?`;
+        await promisePool.query(query,newDept);
+
+        return "New deptartment successfully created";
+        
+    } catch (error) {
+        console.log(error);
+        
+    }
+}
+
+// EMP ROLE QUERIES
+// =============================================================
 
 async function getAllRoles(){
     try {
@@ -56,29 +81,33 @@ async function getAllRoles(){
     }
 }
 
-async function insertNewDept(newDept){
+async function insertNewRole(roleParams){
     try {
-
-        let query = `INSERT INTO department SET ?`;
-        await promisePool.query(query,newDept);
-
-        return "New deptartment successfully created";
         
+        let query = `INSERT INTO emp_role SET ?`;
+        await promisePool.query(query,roleParams);
+
+        return "New role successfully created";
     } catch (error) {
         console.log(error);
         
     }
 }
 
+
+// CLOSE POOL
+// =============================================================
 function closeDB(){
     pool.end();
 }
 
-async function init(){
-    await getAllEmployeeData();
-    closeDB();
-}
+
+
+// async function init(){
+//     await getAllEmployeeData();
+//     closeDB();
+// }
 
 // init();
 
-module.exports = {getAllEmployeeData,getAllDepartments,getAllRoles,insertNewDept,closeDB};
+module.exports = {getAllEmployeeData,getAllDepartments,getAllRoles,insertNewDept,insertNewRole,closeDB};

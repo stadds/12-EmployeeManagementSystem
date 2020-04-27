@@ -154,7 +154,10 @@ async function addNewRole() {
             }
         ]);
 
-        console.log(newRole);
+       //console.log(newRole);
+
+       let result = await myDB.insertNewRole(newRole);
+       console.log(result);
 
     } catch (error) {
         console.log(error);

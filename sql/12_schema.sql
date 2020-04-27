@@ -17,6 +17,7 @@ CREATE TABLE emp_role(
     department_id INT NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (department_id) REFERENCES department(id)
+		 ON UPDATE CASCADE ON DELETE SET NULL 
 );
 
 CREATE TABlE employee(
@@ -26,8 +27,8 @@ CREATE TABlE employee(
     role_id INT NOT NULL ,
     manager_id INT ,    
     PRIMARY KEY (id),
-    FOREIGN KEY (role_id) REFERENCES emp_role(id),
-    FOREIGN KEY (manager_id) REFERENCES employee(id)    
+    FOREIGN KEY (role_id) REFERENCES emp_role(id)  ON UPDATE CASCADE ON DELETE SET NULL ,
+    FOREIGN KEY (manager_id) REFERENCES employee(id)  ON UPDATE CASCADE ON DELETE SET NULL 
 );
 
 
