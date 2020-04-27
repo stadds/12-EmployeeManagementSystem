@@ -47,6 +47,22 @@ async function getEmployeeList(){
     }
 }
 
+async getEmployeeByDept(deptID){
+    try {
+        let query = 'SELECT emp.id, concat(first_name, " ", last_name) as Employee, er.title';
+        query += ' FROM employee emp INNER JOIN emp_role er on er.id = emp.role_id';
+        query += ' WHERE er.department_id = ? ORDER BY emp.id';
+
+        let results = await promisePool.query(query, deptID);
+
+        return results[0];
+        
+    } catch (error) {
+        console.log(error);
+        
+    }
+}
+
 // DEPARTMENT QUERIES
 // =============================================================
 async function getAllDepartments(){
@@ -82,7 +98,7 @@ async function insertNewDept(newDept){
 async function getAllRoles(){
     try {
         
-        let query = 'SELECT er.id, d.name as department, er.title, FORMAT(er.salary,2) as salary ';
+        let query = 'SELECT er.id, d.name as department, er.department_id, er.title, FORMAT(er.salary,2) as salary ';
         query += 'FROM emp_role er INNER JOIN department d ON d.id = er.department_id ';
         query += 'ORDER BY er.department_id, er.id ASC ';
         let results = await promisePool.query(query);
@@ -123,4 +139,12 @@ function closeDB(){
 
 // init();
 
-module.exports = {getAllEmployeeData,getAllDepartments,getAllRoles,insertNewDept,insertNewRole,closeDB};
+module.exports = {
+    getAllEmployeeData,
+    getEmployeeList,
+    getAllDepartments,
+    getAllRoles,
+    insertNewDept,
+    insertNewRole,
+    closeDB
+};
