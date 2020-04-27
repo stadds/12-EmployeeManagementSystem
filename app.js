@@ -3,6 +3,9 @@
 const inquirer = require("inquirer");
 const myDB = require("./db");
 
+
+// Inqurier Prompts
+// =============================================================
 const starterPrompt = [
     {
         name: "actionitem",
@@ -45,57 +48,121 @@ const starterPrompt = [
     },
 ]
 
+// Get User Input
+// =============================================================
 async function getUserInput() {
     try {
 
         let keepGoing = true;
 
-        while(keepGoing === true){
+        while (keepGoing === true) {
 
             const getAction = await inquirer.prompt(starterPrompt);
 
-            switch(getAction.actionitem){
+            switch (getAction.actionitem) {
                 case ("exit"):
-                    console.log(getAction.actionitem);                    
+                    console.log(getAction.actionitem);
                     keepGoing = false;
                     myDB.closeDB();
                     break;
 
                 case ("addDept"):
-                    const newDept = await inquirer.prompt([{
-                        name: "name",
-                        type: "input",
-                        message: "Enter the name of the new department:"
-                    }]);
-                   // console.log(newDept);
-
+                    const newDept = await inquirer.prompt([
+                        {
+                            name: "name",
+                            type: "input",
+                            message: "Enter the name of the new department:"
+                        }
+                    ]);
+                    // console.log(newDept);
                     let result = await myDB.insertNewDept(newDept);
                     console.log(result);
-
                     break;
 
                 case ("viewDept"):
                     const allDepts = await myDB.getAllDepartments();
                     console.table(allDepts);
                     break;
+
+                case ("addRole"):
+                    await addNewRole();
+                    break;
+
                 case ("viewRoles"):
                     const allRoles = await myDB.getAllRoles();
                     console.table(allRoles);
                     break;
+
                 case ("viewEmp"):
                     const allEmps = await myDB.getAllEmployeeData();
                     console.table(allEmps);
                     break;
+
                 default:
                     console.log(getAction.actionitem);
                     break;
             }
         }
-        
+
     } catch (error) {
         console.log(error);
-        
+
     }
 }
+
+// Functions for Switch Cases
+// =============================================================
+async function addNewRole() {
+    try {
+
+        const allDepts = await myDB.getAllDepartments();
+        //console.log(allDepts);
+
+        let choicesArr = [];
+
+        for(let i = 0; i < allDepts.length; i++){
+            let tmpObj = {};
+            tmpObj.name = allDepts[i].name;
+            tmpObj.value = allDepts[i].id;
+            choicesArr.push(tmpObj);
+        }
+
+        ///console.log(choicesArr);
+
+        const newRole = await inquirer.prompt([
+            {
+                name: "title",
+                type: "input",
+                message: "Enter new employee role: "
+            },
+            {
+                name: "salary",
+                type: "input",
+                message: "Enter salary for new role: ",
+                validate: function(value) {
+                    if (isNaN(value) === false) {
+                      return true;
+                    }
+                    return false;
+                  }
+            },
+            {
+                name: "department_id",
+                type: "list",
+                message: "Which department does this role belong to?",
+                choices: choicesArr
+            }
+        ]);
+
+        console.log(newRole);
+
+    } catch (error) {
+        console.log(error);
+
+    }
+}
+
+// RUN
+// =============================================================
 
 getUserInput();
