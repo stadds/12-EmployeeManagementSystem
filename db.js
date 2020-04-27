@@ -47,7 +47,7 @@ async function getEmployeeList(){
     }
 }
 
-async getEmployeeByDept(deptID){
+async function getEmployeeByDept(deptID){
     try {
         let query = 'SELECT emp.id, concat(first_name, " ", last_name) as Employee, er.title';
         query += ' FROM employee emp INNER JOIN emp_role er on er.id = emp.role_id';
@@ -56,7 +56,21 @@ async getEmployeeByDept(deptID){
         let results = await promisePool.query(query, deptID);
 
         return results[0];
+
+    } catch (error) {
+        console.log(error);
         
+    }
+}
+
+async function insertNewEmp(newEmp){
+    try {
+        
+        let query = 'INSERT INTO employee SET ?';
+        await promisePool.query(query,newEmp);
+
+        return "New employee created";
+
     } catch (error) {
         console.log(error);
         
@@ -71,6 +85,7 @@ async function getAllDepartments(){
         let query = 'SELECT * FROM department';
         let results = await promisePool.query(query);
         return results[0];
+        
     } catch (error) {
         console.log(error);
         
@@ -142,6 +157,7 @@ function closeDB(){
 module.exports = {
     getAllEmployeeData,
     getEmployeeList,
+    getEmployeeByDept,
     getAllDepartments,
     getAllRoles,
     insertNewDept,
