@@ -38,7 +38,7 @@ FROM employee emp
 	INNER JOIN emp_role er on er.id = emp.role_id
     INNER JOIN department dpt on dpt.id = er.department_id
 	LEFT JOIN employee mngr on mngr.id = emp.manager_id
-ORDER BY emp.id;
+ORDER BY er.department_id,er.id,emp.id;
 
 SELECT DISTINCT
 	id
