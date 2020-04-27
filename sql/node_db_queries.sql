@@ -1,6 +1,30 @@
 USE employee_mgmtDB;
 
+/*
+	Department SQL Queries
+*/
+-- Get all Departments
+SELECT * FROM department;
 
+-- Add department
+INSERT INTO department SET ?
+
+/*
+	Role SQL Queries
+*/
+-- Get all roles
+SELECT 
+	er.id
+    , d.name as department
+    , er.title
+    , FORMAT(er.salary,2) as salary
+FROM emp_role er
+	INNER JOIN department d ON d.id = er.department_id
+ORDER BY er.department_id, er.id ASC;
+
+/*
+	Employee SQL Queries
+*/
 SELECT 
 	emp.id
     ,emp.first_name

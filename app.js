@@ -60,9 +60,27 @@ async function getUserInput() {
                     keepGoing = false;
                     myDB.closeDB();
                     break;
+
+                case ("addDept"):
+                    const newDept = await inquirer.prompt([{
+                        name: "name",
+                        type: "input",
+                        message: "Enter the name of the new department:"
+                    }]);
+                   // console.log(newDept);
+
+                    let result = await myDB.insertNewDept(newDept);
+                    console.log(result);
+
+                    break;
+
                 case ("viewDept"):
                     const allDepts = await myDB.getAllDepartments();
                     console.table(allDepts);
+                    break;
+                case ("viewRoles"):
+                    const allRoles = await myDB.getAllRoles();
+                    console.table(allRoles);
                     break;
                 case ("viewEmp"):
                     const allEmps = await myDB.getAllEmployeeData();
