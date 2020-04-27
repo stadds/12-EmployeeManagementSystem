@@ -85,7 +85,7 @@ async function getAllDepartments(){
         let query = 'SELECT * FROM department';
         let results = await promisePool.query(query);
         return results[0];
-        
+
     } catch (error) {
         console.log(error);
         
@@ -162,5 +162,6 @@ module.exports = {
     getAllRoles,
     insertNewDept,
     insertNewRole,
+    insertNewEmp,
     closeDB
 };
