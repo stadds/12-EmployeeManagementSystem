@@ -26,13 +26,14 @@ ORDER BY er.department_id, er.id ASC;
 /*
 	Employee SQL Queries
 */
-SELECT 
+SELECT DISTINCT
 	emp.id
     ,emp.first_name
     ,emp.last_name
 	,er.title  
     ,dpt.name as Department
     ,FORMAT(er.salary,2) as Salary
+    , emp.manager_id
     ,IFNULL(concat(mngr.first_name," ",mngr.last_name),"") as Manager
 FROM employee emp
 	INNER JOIN emp_role er on er.id = emp.role_id
@@ -40,11 +41,8 @@ FROM employee emp
 	LEFT JOIN employee mngr on mngr.id = emp.manager_id
 ORDER BY er.department_id,er.id,emp.id;
 
-SELECT DISTINCT
-	id
-    ,concat(first_name, " ", last_name) as Employee
-    ,role_id
-FROM employee
+SELECT DISTINCT emp.id, concat(emp.first_name, " ", emp.last_name) as Employee, emp.role_id, er.title, emp.manager_id
+FROM employee emp INNER JOIN emp_role er on er.id = emp.role_id
 ORDER BY id;
 
 SELECT 

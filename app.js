@@ -12,7 +12,7 @@ const starterPrompt = [
         type: "list",
         message: "What would you like to do?",
         choices: [
-            new inquirer.Separator("---- Department Items ----"),
+            new inquirer.Separator(". . . DEPARTMENT . . ."),
             {
                 name: "Add a department",
                 value: "addDept"
@@ -21,7 +21,7 @@ const starterPrompt = [
                 name: "View all departments",
                 value: "viewDept"
             },
-            new inquirer.Separator("---- Role Items ----"),
+            new inquirer.Separator(". . . ROLE . . ."),
             {
                 name: "Add an employee role",
                 value: "addRole"
@@ -30,7 +30,7 @@ const starterPrompt = [
                 name: "View all employee roles",
                 value: "viewRoles"
             },
-            new inquirer.Separator("---- Employee Items ----"),
+            new inquirer.Separator(". . . EMPLOYEE . . ."),
             {
                 name: "Add an employee",
                 value: "addEmp"
@@ -39,9 +39,14 @@ const starterPrompt = [
                 name: "View all employees",
                 value: "viewEmp"
             },
+            {
+                name: "Update employee's role",
+                value: "updateEmpRole"
+            },
+
             new inquirer.Separator(),
             {
-                name: "Exit",
+                name: "Exit\n",
                 value: "exit"
             }
         ]
@@ -99,8 +104,11 @@ async function getUserInput() {
 
                 case ("viewEmp"):
                     const allEmps = await myDB.getAllEmployeeData();
-                    console.log("view emp")
                     console.table(allEmps);
+                    break;
+
+                case ("updateEmpRole"):
+                    await updateEmpRoleMngr();
                     break;
 
                 default:
@@ -191,23 +199,23 @@ async function addNewEmployee() {
             roleChoices.push(tmpObj);
         }
 
-        //console.log(roleChoices);
+        // console.log(roleChoices);
 
         let empPartA = await inquirer.prompt([
             {
                 name: "first_name",
                 type: "input",
-                message: "Enter new employee's first name: "
+                message: "Enter employee's first name: "
             },
             {
                 name: "last_name",
                 type: "input",
-                message: "Enter new employee's last name: ",
+                message: "Enter employee's last name: ",
             },
             {
                 name: "role_id",
                 type: "list",
-                message: "Select new employee's role: ",
+                message: "Select employee's role: ",
                 choices: roleChoices
             }
         ]);
@@ -218,7 +226,7 @@ async function addNewEmployee() {
         let empPartB = await getEmpManager(empPartA.role_id, roleList);
         //console.log(empPartB);
 
-        let newEmp = {...empPartA,...empPartB};
+        let newEmp = { ...empPartA, ...empPartB };
         // console.log(newEmp);
 
         let result = await myDB.insertNewEmp(newEmp);
@@ -231,38 +239,39 @@ async function addNewEmployee() {
     }
 }
 
-async function getEmpManager(empRoleID, roleList) {
+async function getEmpManager(empRoleID, roleList, excludeID) {
 
     let deptId = null;
 
     //
     for (let i = 0; i < roleList.length; i++) {
-        if(roleList[i].id === empRoleID){
-           // console.log(roleList[i].title +" "+  roleList[i].department_id);
+        if (roleList[i].id === empRoleID) {
+            // console.log(roleList[i].title +" "+  roleList[i].department_id);
             deptId = roleList[i].department_id;
             break;
         }
     }
     //console.log(deptId);
     let managerList = await myDB.getEmployeeByDept(deptId);
-   // console.log(managerList);
+    // console.log(managerList);
 
-    let managerChoice = [{name: "None", value: null}];
+    let managerChoice = [{ name: "None", value: null }];
 
-    for(let j = 0; j < managerList.length;j++){
+    for (let j = 0; j < managerList.length; j++) {
         let tmpObj = {};
-        tmpObj.name = managerList[j].Employee +", "+ managerList[j].title;
+        if (managerList[j].id === excludeID) { continue; };
+        tmpObj.name = managerList[j].Employee + ", " + managerList[j].title;
         tmpObj.value = managerList[j].id;
         managerChoice.push(tmpObj);
     }
-    
+
     //console.log(managerChoice);
 
     let manager = await inquirer.prompt([
         {
             name: "manager_id",
             type: "list",
-            message: "Select new employee's manager: ",
+            message: "Select employee's manager: ",
             choices: managerChoice
         }
     ]);
@@ -270,6 +279,102 @@ async function getEmpManager(empRoleID, roleList) {
     //console.log(manager);
     return manager;
 
+}
+
+
+async function updateEmpRoleMngr() {
+    try {
+
+        let empList = await myDB.getEmployeeList();
+        // console.log(empList);
+
+        let empChoices = [];
+
+        for (let i = 0; i < empList.length; i++) {
+            let tmpObj = {};
+            tmpObj.name = `${empList[i].Employee} - Current Title: ${empList[i].title}`;
+            tmpObj.value = { id: empList[i].id, manager: empList[i].manager_id, role: empList[i].role_id };
+            // tmpObj.value = {role_id: empList[i].role_id, id: empList[i].id};
+            empChoices.push(tmpObj);
+        }
+
+        //console.log(empChoices);
+
+        let roleList = await myDB.getAllRoles();
+
+        //create temp array for inquirer choices array
+        let roleChoices = [];
+
+        //convert department list into inquirer object format, add to array
+        for (let i = 0; i < roleList.length; i++) {
+            let tmpObj = {};
+            tmpObj.name = roleList[i].title;
+            tmpObj.value = roleList[i].id;
+            roleChoices.push(tmpObj);
+        }
+
+
+        let updateParam = await inquirer.prompt([
+            {
+                name: "currentInfo",
+                type: "list",
+                message: "Select employee to update: ",
+                choices: empChoices
+            },
+            {
+                name: "role_id",
+                type: "list",
+                message: "Select employee's new role: ",
+                choices: roleChoices
+            },
+            {
+                name: "update_mgr",
+                type: "list",
+                message: "Update employee's manager?",
+                choices: [
+                    "Yes",
+                    "No"
+                ]
+
+            }
+        ]);
+
+      //  console.log(updateParam);
+
+
+        if (updateParam.update_mgr === "Yes") {
+            let newMgr = await getEmpManager(updateParam.role_id, roleList, updateParam.currentInfo.id);
+            updateParam.manager = newMgr.manager_id;
+        }
+
+        console.log(updateParam);
+
+        let updateEmp = {};
+
+        updateEmp.id = updateParam.currentInfo.id;
+        updateEmp.role_id = updateParam.role_id;
+
+        if (updateParam.update_mgr === "Yes") {
+            updateEmp.manager_id = updateParam.manager;
+        }
+        else if (updateParam.update_mgr === "No") {
+            updateEmp.manager_id = updateParam.currentInfo.manager;
+        }
+
+        console.log(updateEmp);
+
+        let result = await myDB.updateEmpRole(updateEmp);
+
+        console.log(result);
+
+
+
+        //await myDB.upda
+
+    } catch (error) {
+        console.log(error);
+
+    }
 }
 
 // RUN
