@@ -77,7 +77,7 @@ async function insertNewEmp(newEmp) {
     }
 }
 
-async function updateEmpRole(empRole) {
+async function updateEmpRoleMgr(empRole) {
     try {
 
         let query = 'UPDATE employee SET ? WHERE ?';
@@ -128,6 +128,48 @@ async function insertNewDept(newDept) {
     } catch (error) {
         console.log(error);
 
+    }
+}
+
+async function getAllDeptUtilBudget(){
+    try {
+
+        let query = `WITH emp_salaries (dpt_id, dpt_name, role, employee, salary) AS (
+            SELECT DISTINCT dpt.id, dpt.name as Department,er.title , concat(emp.first_name," ",emp.last_name) as "Employee",er.salary 
+             FROM department dpt INNER JOIN emp_role er on er.department_id =  dpt.id INNER JOIN employee emp on emp.role_id = er.id 
+             ORDER BY dpt.id,er.id,emp.id) 
+             SELECT dpt_id ,dpt_name,FORMAT(SUM(salary),2) as "Total" 
+             FROM emp_salaries GROUP BY dpt_id, dpt_name 
+             UNION SELECT "Grand Total", "",FORMAT(SUM(salary),2) as "Total" FROM emp_salaries;`;
+       
+        let results = await promisePool.query(query);
+
+        return results[0];
+        
+        
+    } catch (error) {
+        console.log(error);
+        
+    }
+}
+
+async function getOneDeptBudget(dept){
+    try {
+        
+        let query = `WITH emp_salaries (dpt_id, dpt_name, role, employee, salary) AS (
+            SELECT DISTINCT dpt.id, dpt.name as Department,er.title , concat(emp.first_name," ",emp.last_name) as "Employee",er.salary
+            FROM department dpt INNER JOIN emp_role er on er.department_id =  dpt.id INNER JOIN employee emp on emp.role_id = er.id
+            ORDER BY dpt.id,er.id,emp.id)  
+            SELECT dpt_id ,dpt_name,FORMAT(SUM(salary),2) as "Total"  
+            FROM emp_salaries WHERE dpt_id = ? GROUP BY dpt_id, dpt_name;`;
+        
+        let results = await promisePool.query(query,dept);
+
+        return results[0];
+
+    } catch (error) {
+        console.log(error);
+        
     }
 }
 
@@ -187,6 +229,8 @@ module.exports = {
     insertNewDept,
     insertNewRole,
     insertNewEmp,
-    updateEmpRole,
+    updateEmpRoleMgr,
+    getAllDeptUtilBudget,
+    getOneDeptBudget,
     closeDB
 };

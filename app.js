@@ -14,39 +14,47 @@ const starterPrompt = [
         choices: [
             new inquirer.Separator(". . . DEPARTMENT . . ."),
             {
-                name: "Add a department",
+                name: "  Add a department",
                 value: "addDept"
             },
             {
-                name: "View all departments",
+                name: "  View all departments",
                 value: "viewDept"
+            },
+            {
+                name: "  Get All Department Budgets",
+                value: "getAllBudgets"
+            },
+            {
+                name: "  View One Department's Budget",
+                value: "getOneBudget"
             },
             new inquirer.Separator(". . . ROLE . . ."),
             {
-                name: "Add an employee role",
+                name: "  Add a role",
                 value: "addRole"
             },
             {
-                name: "View all employee roles",
+                name: "  View all roles",
                 value: "viewRoles"
             },
             new inquirer.Separator(". . . EMPLOYEE . . ."),
             {
-                name: "Add an employee",
+                name: "  Add an employee",
                 value: "addEmp"
             },
             {
-                name: "View all employees",
+                name: "  View all employees",
                 value: "viewEmp"
             },
             {
-                name: "Update employee's role",
+                name: "  Update employee's role",
                 value: "updateEmpRole"
             },
 
-            new inquirer.Separator(),
+            new inquirer.Separator(". . . OTHER . . ."),
             {
-                name: "Exit\n",
+                name: "  Exit\n  . . . . . . . . .",
                 value: "exit"
             }
         ]
@@ -89,6 +97,15 @@ async function getUserInput() {
                     console.table(allDepts);
                     break;
 
+                case ("getAllBudgets"):
+                    const allBudgets = await myDB.getAllDeptUtilBudget();
+                    console.table(allBudgets);
+                    break;
+
+                case ("getOneBudget"):
+                    await getOneDeptBudget();
+                    break;
+
                 case ("addRole"):
                     await addNewRole();
                     break;
@@ -108,7 +125,7 @@ async function getUserInput() {
                     break;
 
                 case ("updateEmpRole"):
-                    await updateEmpRoleMngr();
+                    await updateEmpRole();
                     break;
 
                 default:
@@ -282,7 +299,7 @@ async function getEmpManager(empRoleID, roleList, excludeID) {
 }
 
 
-async function updateEmpRoleMngr() {
+async function updateEmpRole() {
     try {
 
         let empList = await myDB.getEmployeeList();
@@ -339,15 +356,14 @@ async function updateEmpRoleMngr() {
             }
         ]);
 
-      //  console.log(updateParam);
-
+        //  console.log(updateParam);
 
         if (updateParam.update_mgr === "Yes") {
             let newMgr = await getEmpManager(updateParam.role_id, roleList, updateParam.currentInfo.id);
             updateParam.manager = newMgr.manager_id;
         }
 
-        console.log(updateParam);
+        // console.log(updateParam);
 
         let updateEmp = {};
 
@@ -361,15 +377,47 @@ async function updateEmpRoleMngr() {
             updateEmp.manager_id = updateParam.currentInfo.manager;
         }
 
-        console.log(updateEmp);
+        // console.log(updateEmp);
 
-        let result = await myDB.updateEmpRole(updateEmp);
+        let result = await myDB.updateEmpRoleMgr(updateEmp);
 
         console.log(result);
 
+    } catch (error) {
+        console.log(error);
 
+    }
+}
 
-        //await myDB.upda
+async function getOneDeptBudget() {
+    try {
+
+        let deptList = await myDB.getAllDepartments();
+
+        let deptChoices = [];
+
+        //convert department list into inquirer object format, add to array
+        for (let i = 0; i < deptList.length; i++) {
+            let tmpObj = {};
+            tmpObj.name = deptList[i].name;
+            tmpObj.value = deptList[i].id;
+            deptChoices.push(tmpObj);
+        }
+
+        let dept = await inquirer.prompt([
+            {
+                name: "id",
+                type: "list",
+                message: "Select department: ",
+                choices: deptChoices
+            }
+        ]);
+
+        console.log(dept.id)
+
+        let deptBudget = await myDB.getOneDeptBudget(dept.id);
+
+        console.table(deptBudget);
 
     } catch (error) {
         console.log(error);

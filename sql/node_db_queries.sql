@@ -9,6 +9,35 @@ SELECT * FROM department;
 -- Add department
 INSERT INTO department SET ? ;
 
+
+
+;
+
+WITH emp_salaries (dpt_id, dpt_name, role, employee, salary) AS (
+SELECT DISTINCT
+	dpt.id
+    ,dpt.name as Department
+    ,er.title
+    , concat(emp.first_name," ",emp.last_name) as "Employee"
+    ,er.salary
+FROM department dpt
+	INNER JOIN emp_role er on er.department_id =  dpt.id
+	INNER JOIN employee emp on emp.role_id = er.id
+ORDER BY dpt.id,er.id,emp.id )
+SELECT 
+	dpt_id
+    ,dpt_name
+    ,FORMAT(SUM(salary),2) as "Total"
+FROM emp_salaries
+GROUP BY dpt_id, dpt_name
+UNION
+SELECT 
+	"Grand Total"
+    , ""
+	,FORMAT(SUM(salary),2) as "Total"
+FROM emp_salaries;
+
+
 /*
 	Role SQL Queries
 */
