@@ -69,13 +69,14 @@ UPDATE employee SET manager_id = 16 WHERE id = 15;
 SELECT * FROM employee;
 
 SELECT
-	emp.first_name
+	emp.id
+	,emp.first_name
     ,emp.last_name
     ,concat(mngr.first_name, " ", mngr.last_name) as Manager
     ,dpt.name as Department
     ,er.title    
 FROM employee emp
-	INNER JOIN emp_role er on er.id = emp.role_id
-    INNER JOIN department dpt on dpt.id = er.department_id
+	LEFT JOIN emp_role er on er.id = emp.role_id
+    LEFT JOIN department dpt on dpt.id = er.department_id
 	LEFt JOIN employee mngr on mngr.id = emp.manager_id
 ORDER BY emp.id;

@@ -51,10 +51,13 @@ const starterPrompt = [
                 name: "  Update employee's role",
                 value: "updateEmpRole"
             },
-
+            {
+                name: "  Delete Employee",
+                value: "deleteEmp"
+            },
             new inquirer.Separator(". . . OTHER . . ."),
             {
-                name: "  Exit\n  . . . . . . . . .",
+                name: "  Exit\n  . . . . . . . . .\n\n",
                 value: "exit"
             }
         ]
@@ -128,6 +131,9 @@ async function getUserInput() {
                     await updateEmpRole();
                     break;
 
+                case ("deleteEmp"):
+                    await deleteEmployee();
+                    break;
                 default:
                     console.log(getAction.actionitem);
                     break;
@@ -423,6 +429,47 @@ async function getOneDeptBudget() {
         console.log(error);
 
     }
+}
+
+async function deleteEmployee(){
+    try {
+
+        let empList = await myDB.getEmployeeList();
+        // console.log(empList);
+
+        let empChoices = [];
+
+        for (let i = 0; i < empList.length; i++) {
+            let tmpObj = {};
+            tmpObj.name = `${empList[i].Employee} - ${empList[i].title}`;
+            tmpObj.value = empList[i].id;
+            // tmpObj.value = {role_id: empList[i].role_id, id: empList[i].id};
+            empChoices.push(tmpObj);
+        }
+
+        let deleteEmp = await inquirer.prompt([
+            {
+                name: "id",
+                type: "list",
+                message: "Select employee to delete: ",
+                choices: empChoices
+            }
+        ]);
+        
+        console.log(deleteEmp);
+        
+
+       let result = await myDB.deleteEmployee(deleteEmp);
+
+       console.log(result);
+       
+
+        
+    } catch (error) {
+        console.log(error);
+        
+    }
+
 }
 
 // RUN

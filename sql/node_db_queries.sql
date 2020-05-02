@@ -49,7 +49,7 @@ SELECT
     , er.title
     , FORMAT(er.salary,2) as salary
 FROM emp_role er
-	INNER JOIN department d ON d.id = er.department_id
+	LEFT JOIN department d ON d.id = er.department_id
 ORDER BY er.department_id, er.id ASC;
 
 /*
@@ -65,8 +65,8 @@ SELECT DISTINCT
     , emp.manager_id
     ,IFNULL(concat(mngr.first_name," ",mngr.last_name),"") as Manager
 FROM employee emp
-	INNER JOIN emp_role er on er.id = emp.role_id
-    INNER JOIN department dpt on dpt.id = er.department_id
+	LEFT JOIN emp_role er on er.id = emp.role_id
+    LEFT JOIN department dpt on dpt.id = er.department_id
 	LEFT JOIN employee mngr on mngr.id = emp.manager_id
 ORDER BY er.department_id,er.id,emp.id;
 
@@ -97,3 +97,23 @@ FROM employee emp
 	INNER JOIN emp_role er on er.id = emp.role_id
 WHERE er.department_id = 3
 ORDER BY emp.id;
+;
+-- Get Employee by Manager
+WITH emp_list (id,fname,lname,role,manager,title) AS (
+	SELECT
+		emp.id
+        , emp.first_name
+        , emp.last_name
+        , emp.role_id 
+        , emp.manager_id
+        , er.title
+	FROM employee emp
+		LEFT JOIN emp_role er on er.id = emp.role_id
+)
+SELECT 
+	CONCAT(mgr.fname," ",mgr.lname) AS "Manager"
+    , mgr.title as "Manager Title"
+    , CONCAT(emp.fname," ",emp.lname) as "Employee"
+    , emp.title as "Employee Title"
+FROM emp_list emp
+	INNER JOIN emp_list mgr ON mgr.id = emp.manager;
