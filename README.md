@@ -1,8 +1,13 @@
 # Employee Management System
 
 ## Description
-Using only a command line interface solve for the user story "As a business user, I WANT to be able to view and manage the departments, roles, and employees in my company, SO THAT i can organize and plan my business"
+Using only a command line interface solve the user story 
 
+```
+AS A business user
+I WANT to be able to view and manage the departments, roles, and employees in my company
+SO THAT i can organize and plan my business
+```
 
 ## Table of Contents
 
@@ -58,7 +63,7 @@ N/A
 
 ---
 ## Questions
-None at this time.
+N/A
 
 ### Contact Me
 * email:  staddi@gmail.com
