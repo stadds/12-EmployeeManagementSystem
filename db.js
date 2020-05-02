@@ -90,6 +90,23 @@ async function getOneDeptBudget(dept) {
     }
 }
 
+
+async function deleteDept(delDept) {
+    try {
+
+        let query = 'DELETE FROM department WHERE ID = ?';
+
+        await promisePool.query(query, delDept.id);
+
+        return "\ndepartment successfully deleted. . . .\n";
+
+    } catch (error) {
+        console.log(error);
+
+    }
+}
+
+
 // EMP ROLE QUERIES
 // =============================================================
 
@@ -124,6 +141,115 @@ async function insertNewRole(roleParams) {
 
     }
 }
+
+
+async function getManagerList() {
+    try {
+
+        let query = `WITH emp_list (id,fname,lname,role,manager,title) AS (
+            SELECT
+                emp.id
+                , emp.first_name
+                , emp.last_name
+                , emp.role_id 
+                , emp.manager_id
+                , er.title
+            FROM employee emp
+                LEFT JOIN emp_role er on er.id = emp.role_id
+        )
+        SELECT DISTINCT
+            mgr.id
+            , CONCAT(mgr.fname," ",mgr.lname) AS "Manager"
+            , mgr.title
+            , COUNT(emp.id) as "Num_DirectReports"
+        FROM emp_list emp
+            INNER JOIN emp_list mgr ON mgr.id = emp.manager
+        GROUP BY mgr.id,  CONCAT(mgr.fname," ",mgr.lname);`
+
+        let results = await promisePool.query(query);
+
+        return results[0];
+
+    } catch (error) {
+        console.log(error);
+
+    }
+}
+
+
+async function deleteRole(delRole) {
+    try {
+
+        let query = 'DELETE FROM emp_role WHERE ID = ?';
+
+        await promisePool.query(query, delRole.id);
+        // console.log(result);
+        // console.log(result[0]);
+
+        let message = "\nrole successfully deleted. . . .\n";
+
+        return message;
+
+    } catch (error) {
+        console.log(error.message);
+
+    }
+}
+
+
+async function getRoleEmpCount() {
+    try {
+
+        let query = `SELECT er.id, er. title, COUNT(emp.id) as EmployeeCount`;
+        query += ` FROM emp_role er LEFT JOIN employee emp on emp.role_id = er.id`;
+        query += ` GROUP BY er.id, er.title ORDER BY EmployeeCount,er.id;`;
+
+        // console.log(query);
+
+        let results = await promisePool.query(query);
+        // console.log(results);
+        // console.log(results[0]);
+
+         return results[0];
+
+    } catch (error) {
+        console.log(error);
+
+    }
+}
+
+async function updateRoleDept(roleDept){
+    try {
+
+        let query = "UPDATE emp_role SET department_id = ? WHERE id = ?";
+
+        await promisePool.query(query,[roleDept.department_id,roleDept.id]);
+
+        return "\nrole's department successfully updated. . . .\n";  
+        
+    } catch (error) {
+        console.log(error);        
+    }
+
+}
+
+
+async function updateRoleSalary(roleSal){
+    try {
+
+        let query = "UPDATE emp_role SET salary = ? WHERE id = ?";
+
+        await promisePool.query(query,[roleSal.salary,roleSal.id]);
+
+        return "\nrole's salary successfully updated. . . .\n"
+        
+    } catch (error) {
+        console.log(error);
+        
+    }
+
+}
+
 
 // EMPLOYEE QUERIES
 // =============================================================
@@ -226,39 +352,6 @@ async function deleteEmployee(deleteEmp) {
 }
 
 
-async function getManagerList() {
-    try {
-
-        let query = `WITH emp_list (id,fname,lname,role,manager,title) AS (
-            SELECT
-                emp.id
-                , emp.first_name
-                , emp.last_name
-                , emp.role_id 
-                , emp.manager_id
-                , er.title
-            FROM employee emp
-                LEFT JOIN emp_role er on er.id = emp.role_id
-        )
-        SELECT DISTINCT
-            mgr.id
-            , CONCAT(mgr.fname," ",mgr.lname) AS "Manager"
-            , mgr.title
-            , COUNT(emp.id) as "Num_DirectReports"
-        FROM emp_list emp
-            INNER JOIN emp_list mgr ON mgr.id = emp.manager
-        GROUP BY mgr.id,  CONCAT(mgr.fname," ",mgr.lname);`
-
-        let results = await promisePool.query(query);
-
-        return results[0];
-
-    } catch (error) {
-        console.log(error);
-
-    }
-}
-
 async function getEmpByMgr(empManager) {
     try {
 
@@ -275,93 +368,6 @@ async function getEmpByMgr(empManager) {
         console.log(error);
 
     }
-}
-
-async function deleteRole(delRole) {
-    try {
-
-        let query = 'DELETE FROM emp_role WHERE ID = ?';
-
-        await promisePool.query(query, delRole.id);
-        // console.log(result);
-        // console.log(result[0]);
-
-        let message = "\nrole successfully deleted. . . .\n";
-
-        return message;
-
-    } catch (error) {
-        console.log(error.message);
-
-    }
-}
-
-async function deleteDept(delDept) {
-    try {
-
-        let query = 'DELETE FROM department WHERE ID = ?';
-
-        await promisePool.query(query, delDept.id);
-
-        return "\ndepartment successfully deleted. . . .\n";
-
-    } catch (error) {
-        console.log(error);
-
-    }
-}
-
-async function getRoleEmpCount() {
-    try {
-
-        let query = `SELECT er.id, er. title, COUNT(emp.id) as EmployeeCount`;
-        query += ` FROM emp_role er LEFT JOIN employee emp on emp.role_id = er.id`;
-        query += ` GROUP BY er.id, er.title ORDER BY EmployeeCount,er.id;`;
-
-        // console.log(query);
-
-        let results = await promisePool.query(query);
-        // console.log(results);
-        // console.log(results[0]);
-
-         return results[0];
-
-    } catch (error) {
-        console.log(error);
-
-    }
-}
-
-async function updateRoleDept(roleDept){
-    try {
-
-        let query = "UPDATE emp_role SET department_id = ? WHERE id = ?";
-
-        await promisePool.query(query,[roleDept.department_id,roleDept.id]);
-
-        return "\nrole's department successfully updated. . . .\n";  
-        
-    } catch (error) {
-        console.log(error);        
-    }
-
-}
-
-
-async function updateRoleSalary(roleSal){
-    try {
-
-        let query = "UPDATE emp_role SET salary = ? WHERE id = ?";
-
-        await promisePool.query(query,[roleSal.salary,roleSal.id]);
-
-        return "\nrole's salary successfully updated. . . .\n"
-        
-    } catch (error) {
-        console.log(error);
-        
-    }
-
 }
 
 
