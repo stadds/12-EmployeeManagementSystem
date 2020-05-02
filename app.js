@@ -57,6 +57,14 @@ const starterPrompt = [
                 name: "  Update Employee's Role",
                 value: "updateEmpRole"
             },
+            {
+                name: "  Update Role's Department",
+                value: "updateRoleDept"
+            },
+            {
+                name: "  Update Role's Salary",
+                value: "updateRoleSalary"
+            },
 
             new inquirer.Separator(". . . DELETE . . ."),
             {
@@ -132,6 +140,13 @@ async function getUserInput() {
 
                 case ("addRole"):
                     await addNewRole();
+                    break;
+
+                case ("updateRoleSalary"):
+                    break;
+
+                case ("updateRoleDept"):
+                    await updateRoleDept();
                     break;
 
                 case ("viewRoles"):
@@ -589,7 +604,7 @@ async function deleteRole() {
     }
 }
 
-async function deleteDepartment(){
+async function deleteDepartment() {
     try {
 
         let deptList = await myDB.getAllDepartments();
@@ -603,7 +618,7 @@ async function deleteDepartment(){
             deptChoices.push(tmpObj);
         }
 
-        
+
         let delDept = await inquirer.prompt([
             {
                 name: "id",
@@ -625,8 +640,8 @@ async function deleteDepartment(){
         // console.log(delDept);
 
         let result = "";
-        
-        if(delDept.confirm === "Yes") {
+
+        if (delDept.confirm === "Yes") {
             result = await myDB.deleteDept(delDept);
         }
         else {
@@ -634,10 +649,134 @@ async function deleteDepartment(){
         }
 
         console.log(result);
-        
+
     } catch (error) {
         console.log(error);
-        
+
+    }
+}
+
+async function updateRoleDept() {
+    try {
+
+        let roleList = await myDB.getAllRoles();
+
+        //create temp array for inquirer choices array
+        let roleChoices = [];
+
+        //convert role list into inquirer object format, add to array
+        for (let i = 0; i < roleList.length; i++) {
+            let tmpObj = {};
+            tmpObj.name = `${roleList[i].title} - Current Dept: ${roleList[i].department}`;
+            tmpObj.value = roleList[i].id;
+            roleChoices.push(tmpObj);
+        }
+
+        let deptList = await myDB.getAllDepartments();
+
+        let deptChoices = [];
+
+        for (let i = 0; i < deptList.length; i++) {
+            let tmpObj = {};
+            tmpObj.name = deptList[i].name;
+            tmpObj.value = deptList[i].id;
+            deptChoices.push(tmpObj);
+        }
+
+        let roleDept = await inquirer.prompt([
+            {
+                name: "id",
+                type: "list",
+                message: "Select role to update: ",
+                choices: roleChoices
+            },
+            {
+                name: "department_id",
+                type: "list",
+                message: "Select role's new department: ",
+                choices: deptChoices
+            },
+            {
+                name: "confirm",
+                type: "list",
+                message: "Are you sure you want to update this role to a new department?",
+                choices: [
+                    "No",
+                    "Yes"
+                ]
+            }
+        ]);
+
+        console.log(roleDept);
+
+        let result = "";
+
+        if (roleDept.confirm === "Yes") {
+            result = await myDB.updateRoleDept(roleDept);
+        }
+        else {
+            result = "\ncanceling update role's department. . . .\n"
+        }
+
+        console.log(result);
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
+async function updateRoleSalary() {
+    try {
+
+
+        let roleList = await myDB.getAllRoles();
+
+        //create temp array for inquirer choices array
+        let roleChoices = [];
+
+        //convert role list into inquirer object format, add to array
+        for (let i = 0; i < roleList.length; i++) {
+            let tmpObj = {};
+            tmpObj.name = `${roleList[i].title} - Current Salary: ${roleList[i].salary}`;
+            tmpObj.value = roleList[i].id;
+            roleChoices.push(tmpObj);
+        }
+
+        let roleSalary = await inquirer.prompt([
+            {
+                name: "id",
+                type: "list",
+                message: "Select role to update: ",
+                choices: roleChoices
+            },
+            {
+                name: "salary",
+                type: "input",
+                message: "Enter new salary for  role: ",
+                validate: function (value) {
+                    if (isNaN(value) === false) {
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                name: "confirm",
+                type: "list",
+                message: "Are you sure you want to update this role's salary?",
+                choices: [
+                    "No",
+                    "Yes"
+                ]
+            }
+        ]);
+
+        console.log(roleSalary);
+
+
+    } catch (error) {
+        console.log(error);
     }
 }
 

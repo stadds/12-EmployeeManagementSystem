@@ -337,7 +337,7 @@ async function updateRoleDept(roleDept){
 
         let query = "UPDATE emp_role SET department_id = ? WHERE id = ?";
 
-        await promisePool.query(query,[roleDept.deptartnemt_id,roleDept.id]);
+        await promisePool.query(query,[roleDept.department_id,roleDept.id]);
 
         return "\nrole's department successfully updated. . . .\n";  
         
