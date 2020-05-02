@@ -130,7 +130,18 @@ FROM employee emp
 WHERE emp.manager_id = 11
 ORDER BY emp.id;
 
+-- Roles, Count of Employees
+SELECT 
+	er.id
+	, er. title 
+    ,COUNT(emp.id) as EmployeeCount
+FROM emp_role er
+	LEFT JOIN employee emp on emp.role_id = er.id
+GROUP BY er.id, er.title
+ORDER BY EmployeeCount,er.id;
 
-DELETE FROM emp_role WHERE ID = ?;
+SELECT * FROM emp_role;
+
+DELETE FROM emp_role WHERE ID = 3;
 
 DELETE FROM deptartment WHERE ID = ?;

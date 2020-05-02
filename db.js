@@ -23,7 +23,7 @@ const promisePool = pool.promise();
 async function getAllDepartments() {
     try {
 
-        let query = 'SELECT * FROM department';
+        let query = 'SELECT id, name FROM department';
         let results = await promisePool.query(query);
         return results[0];
 
@@ -48,7 +48,7 @@ async function insertNewDept(newDept) {
     }
 }
 
-async function getAllDeptUtilBudget(){
+async function getAllDeptUtilBudget() {
     try {
 
         let query = `WITH emp_salaries (dpt_id, dpt_name, role, employee, salary) AS (
@@ -58,35 +58,35 @@ async function getAllDeptUtilBudget(){
              SELECT dpt_id ,dpt_name,FORMAT(SUM(salary),2) as "Total" 
              FROM emp_salaries GROUP BY dpt_id, dpt_name 
              UNION SELECT "Grand Total", "",FORMAT(SUM(salary),2) as "Total" FROM emp_salaries;`;
-       
+
         let results = await promisePool.query(query);
 
         return results[0];
-        
-        
+
+
     } catch (error) {
         console.log(error);
-        
+
     }
 }
 
-async function getOneDeptBudget(dept){
+async function getOneDeptBudget(dept) {
     try {
-        
+
         let query = `WITH emp_salaries (dpt_id, dpt_name, role, employee, salary) AS (
             SELECT DISTINCT dpt.id, dpt.name as Department,er.title , concat(emp.first_name," ",emp.last_name) as "Employee",er.salary
             FROM department dpt INNER JOIN emp_role er on er.department_id =  dpt.id INNER JOIN employee emp on emp.role_id = er.id
             ORDER BY dpt.id,er.id,emp.id)  
             SELECT dpt_id ,dpt_name,FORMAT(SUM(salary),2) as "Total"  
             FROM emp_salaries WHERE dpt_id = ? GROUP BY dpt_id, dpt_name;`;
-        
-        let results = await promisePool.query(query,dept);
+
+        let results = await promisePool.query(query, dept);
 
         return results[0];
 
     } catch (error) {
         console.log(error);
-        
+
     }
 }
 
@@ -97,8 +97,8 @@ async function getAllRoles() {
     try {
 
         let query = 'SELECT er.id, d.name as department, er.department_id, er.title, FORMAT(er.salary,2) as salary ';
-        query += 'FROM emp_role er LEFT JOIN department d ON d.id = er.department_id ';
-        query += 'ORDER BY er.department_id, er.id ASC ';
+        query += ' FROM emp_role er LEFT JOIN department d ON d.id = er.department_id ';
+        query += ' ORDER BY er.department_id, er.id ASC ';
         let results = await promisePool.query(query);
         return results[0];
 
@@ -190,7 +190,7 @@ async function updateEmpRoleMgr(empRole) {
                 {
                     role_id: empRole.role_id,
                     manager_id: empRole.manager_id
-                }, 
+                },
                 {
                     id: empRole.id
                 }
@@ -203,22 +203,22 @@ async function updateEmpRoleMgr(empRole) {
     }
 }
 
-async function deleteEmployee(deleteEmp){
+async function deleteEmployee(deleteEmp) {
     try {
 
         let query = "DELETE FROM employee WHERE id = ?";
-        await promisePool.query(query,deleteEmp.id);
+        await promisePool.query(query, deleteEmp.id);
 
         return "\nemployee successfully deleted. . . .\n"
-        
+
     } catch (error) {
         console.log(error);
-        
+
     }
 }
 
 
-async function getManagerList(){
+async function getManagerList() {
     try {
 
         let query = `WITH emp_list (id,fname,lname,role,manager,title) AS (
@@ -244,58 +244,84 @@ async function getManagerList(){
         let results = await promisePool.query(query);
 
         return results[0];
-        
+
     } catch (error) {
         console.log(error);
-        
+
     }
 }
 
-async function getEmpByMgr(empManager){
+async function getEmpByMgr(empManager) {
     try {
 
         let query = 'SELECT emp.id, concat(first_name, " ", last_name) as Employee, er.title';
         query += ' FROM employee emp INNER JOIN emp_role er on er.id = emp.role_id';
         query += ' WHERE emp.manager_id = ? ORDER BY emp.id';
 
-        let results = await await promisePool.query(query,empManager.manager_id);
+        let results = await await promisePool.query(query, empManager.manager_id);
 
         return results[0];
 
-        
+
     } catch (error) {
         console.log(error);
-        
+
     }
 }
 
-async function deleteRole(delRole){
+async function deleteRole(delRole) {
     try {
 
         let query = 'DELETE FROM emp_role WHERE ID = ?';
 
-        await promisePool.query(query,delRole.id);
+        await promisePool.query(query, delRole.id);
+        // console.log(result);
+        // console.log(result[0]);
 
-        return "\nrole successfully deleted. . . .\n";
-        
+        let message = "\nrole successfully deleted. . . .\n";
+
+        return message;
+
     } catch (error) {
-        console.log(error);
-        
+        console.log(error.message);
+
     }
 }
 
-async function deleteDept(delDept){
+async function deleteDept(delDept) {
     try {
 
         let query = 'DELETE FROM department WHERE ID = ?';
 
-        await promisePool.query(query,delDept.id);
+        await promisePool.query(query, delDept.id);
 
         return "\ndepartment successfully deleted. . . .\n";
-        
+
     } catch (error) {
         console.log(error);
-        
+
+    }
+}
+
+async function getRoleEmpCount() {
+    try {
+
+        let query = `SELECT er.id, er. title, COUNT(emp.id) as EmployeeCount`;
+        query += ` FROM emp_role er LEFT JOIN employee emp on emp.role_id = er.id`;
+        query += ` GROUP BY er.id, er.title ORDER BY EmployeeCount,er.id;`;
+
+        // console.log(query);
+
+        let results = await promisePool.query(query);
+        // console.log(results);
+        // console.log(results[0]);
+
+         return results[0];
+
+
+    } catch (error) {
+        console.log(error);
+
     }
 }
 
@@ -330,5 +356,8 @@ module.exports = {
     deleteEmployee,
     getManagerList,
     getEmpByMgr,
+    deleteRole,
+    deleteDept,
+    getRoleEmpCount,
     closeDB
 };

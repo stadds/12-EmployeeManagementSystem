@@ -12,61 +12,66 @@ const starterPrompt = [
         type: "list",
         message: "What would you like to do?",
         choices: [
-            new inquirer.Separator(". . . DEPARTMENT . . ."),
+            new inquirer.Separator(". . . REPORTING . . ."),
             {
-                name: "  Add a department",
-                value: "addDept"
-            },
-            {
-                name: "  View all departments",
-                value: "viewDept"
-            },
-            {
-                name: "  Get All Department Budgets",
-                value: "getAllBudgets"
-            },
-            {
-                name: "  View One Department's Budget",
-                value: "getOneBudget"
-            },
-            {
-                name: "  Delete A Department",
-                value: "deleteDept"
-            },
-            new inquirer.Separator(". . . ROLE . . ."),
-            {
-                name: "  Add a role",
-                value: "addRole"
-            },
-            {
-                name: "  View all roles",
-                value: "viewRoles"
-            },
-            {
-                name: "  Delete A Role",
-                value: "deleteRole"
-            },
-            new inquirer.Separator(". . . EMPLOYEE . . ."),
-            {
-                name: "  Add an employee",
-                value: "addEmp"
-            },
-            {
-                name: "  View all employees",
+                name: "  View All Employees",
                 value: "viewEmp"
-            },
-            {
-                name: "  Update employee's role",
-                value: "updateEmpRole"
             },
             {
                 name: "  View Employees by Specific Manager",
                 value: "getEmpMgr"
             },
             {
-                name: "  Delete Employee",
+                name: "  View All Roles",
+                value: "viewRoles"
+            },
+            {
+                name: "  View All Departments",
+                value: "viewDept"
+            },
+            {
+                name: "  View One Department's Budget",
+                value: "getOneBudget"
+            },
+            {
+                name: "  View All Department Budgets",
+                value: "getAllBudgets"
+            },
+
+            new inquirer.Separator(". . . ADD . . ."),
+            {
+                name: "  Add A Department",
+                value: "addDept"
+            },
+            {
+                name: "  Add A Role",
+                value: "addRole"
+            },
+            {
+                name: "  Add An Employee",
+                value: "addEmp"
+            },
+
+            new inquirer.Separator(". . . UPDATE . . ."),
+            {
+                name: "  Update Employee's Role",
+                value: "updateEmpRole"
+            },
+
+            new inquirer.Separator(". . . DELETE . . ."),
+            {
+                name: "  Delete A Department",
+                value: "deleteDept"
+            },
+            {
+                name: "  Delete A Role",
+                value: "deleteRole"
+            },
+            {
+                name: "  Delete An Employee",
                 value: "deleteEmp"
             },
+
             new inquirer.Separator(". . . OTHER . . ."),
             {
                 name: "  Exit\n  . . . . . . . . .\n\n",
@@ -121,6 +126,10 @@ async function getUserInput() {
                     await getOneDeptBudget();
                     break;
 
+                case ("deleteDept"):
+                    await deleteDepartment();
+                    break;
+
                 case ("addRole"):
                     await addNewRole();
                     break;
@@ -128,6 +137,10 @@ async function getUserInput() {
                 case ("viewRoles"):
                     const allRoles = await myDB.getAllRoles();
                     console.table(allRoles);
+                    break;
+
+                case ("deleteRole"):
+                    await deleteRole();
                     break;
 
                 case ("addEmp"):
@@ -150,6 +163,7 @@ async function getUserInput() {
                 case ("deleteEmp"):
                     await deleteEmployee();
                     break;
+
                 default:
                     console.log(getAction.actionitem);
                     break;
@@ -344,7 +358,7 @@ async function updateEmpRole() {
         //create temp array for inquirer choices array
         let roleChoices = [];
 
-        //convert department list into inquirer object format, add to array
+        //convert role list into inquirer object format, add to array
         for (let i = 0; i < roleList.length; i++) {
             let tmpObj = {};
             tmpObj.name = roleList[i].title;
@@ -447,7 +461,7 @@ async function getOneDeptBudget() {
     }
 }
 
-async function deleteEmployee(){
+async function deleteEmployee() {
     try {
 
         let empList = await myDB.getEmployeeList();
@@ -471,24 +485,24 @@ async function deleteEmployee(){
                 choices: empChoices
             }
         ]);
-        
+
         console.log(deleteEmp);
-        
 
-       let result = await myDB.deleteEmployee(deleteEmp);
 
-       console.log(result);
-       
+        let result = await myDB.deleteEmployee(deleteEmp);
 
-        
+        console.log(result);
+
+
+
     } catch (error) {
         console.log(error);
-        
+
     }
 
 }
 
-async function getEmpByManager(){
+async function getEmpByManager() {
     try {
 
         let managerList = await myDB.getManagerList();
@@ -518,6 +532,108 @@ async function getEmpByManager(){
         let results = await myDB.getEmpByMgr(empList);
 
         console.table(results);
+
+    } catch (error) {
+        console.log(error);
+
+    }
+}
+
+async function deleteRole() {
+    try {
+
+        let roleList = await myDB.getRoleEmpCount();
+
+        //create temp array for inquirer choices array
+        let roleChoices = [];
+
+        //convert role list into inquirer object format, add to array
+        for (let i = 0; i < roleList.length; i++) {
+            let tmpObj = {};
+            tmpObj.name = `${roleList[i].title} - # Employees: ${roleList[i].EmployeeCount}`;
+
+            if (roleList[i].EmployeeCount > 0) {
+                tmpObj.value = { id: roleList[i].id, canDelete: false };
+            }
+            else {
+                tmpObj.value = { id: roleList[i].id, canDelete: true };
+            }
+            roleChoices.push(tmpObj);
+        }
+
+        let delRole = await inquirer.prompt([
+            {
+                name: "selected",
+                type: "list",
+                message: "Select Role to Delete: ",
+                choices: roleChoices
+            }
+        ]);
+
+        // console.log(delRole);
+
+        let result = "";
+
+        if (delRole.selected.canDelete === true) {
+            result = await myDB.deleteRole(delRole.selected);
+        }
+        else if (delRole.selected.canDelete === false) {
+            result = "!! WARNING !! \nCannot delete a role that has employees. \nPlease re-assign employees before deleting this role.\n";
+        }
+
+        console.log(result);
+
+    } catch (error) {
+        console.log(error);
+
+    }
+}
+
+async function deleteDepartment(){
+    try {
+
+        let deptList = await myDB.getAllDepartments();
+
+        let deptChoices = [];
+
+        for (let i = 0; i < deptList.length; i++) {
+            let tmpObj = {};
+            tmpObj.name = deptList[i].name;
+            tmpObj.value = deptList[i].id;
+            deptChoices.push(tmpObj);
+        }
+
+        
+        let delDept = await inquirer.prompt([
+            {
+                name: "id",
+                type: "list",
+                message: "Select Department to Delete: ",
+                choices: deptChoices
+            },
+            {
+                name: "confirm",
+                type: "list",
+                message: "!! WARNING !! \n  Any roles in this deparment will now have a department of NULL. \n  Proceed with department deletion?: ",
+                choices: [
+                    "No",
+                    "Yes"
+                ]
+            }
+        ]);
+
+        // console.log(delDept);
+
+        let result = "";
+        
+        if(delDept.confirm === "Yes") {
+            result = await myDB.deleteDept(delDept);
+        }
+        else {
+            result = "Canceling 'Delete A Department'";
+        }
+
+        console.log(result);
         
     } catch (error) {
         console.log(error);
