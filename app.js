@@ -29,6 +29,10 @@ const starterPrompt = [
                 name: "  View One Department's Budget",
                 value: "getOneBudget"
             },
+            {
+                name: "  Delete A Department",
+                value: "deleteDept"
+            },
             new inquirer.Separator(". . . ROLE . . ."),
             {
                 name: "  Add a role",
@@ -37,6 +41,10 @@ const starterPrompt = [
             {
                 name: "  View all roles",
                 value: "viewRoles"
+            },
+            {
+                name: "  Delete A Role",
+                value: "deleteRole"
             },
             new inquirer.Separator(". . . EMPLOYEE . . ."),
             {
@@ -50,6 +58,10 @@ const starterPrompt = [
             {
                 name: "  Update employee's role",
                 value: "updateEmpRole"
+            },
+            {
+                name: "  View Employees by Specific Manager",
+                value: "getEmpMgr"
             },
             {
                 name: "  Delete Employee",
@@ -129,6 +141,10 @@ async function getUserInput() {
 
                 case ("updateEmpRole"):
                     await updateEmpRole();
+                    break;
+
+                case ("getEmpMgr"):
+                    await getEmpByManager();
                     break;
 
                 case ("deleteEmp"):
@@ -470,6 +486,43 @@ async function deleteEmployee(){
         
     }
 
+}
+
+async function getEmpByManager(){
+    try {
+
+        let managerList = await myDB.getManagerList();
+        // console.log(managerList);
+
+        let mgrChoices = [];
+
+        for (let i = 0; i < managerList.length; i++) {
+            let tmpObj = {};
+            tmpObj.name = `${managerList[i].Manager} - ${managerList[i].title} - Direct Reports: ${managerList[i].Num_DirectReports} `;
+            tmpObj.value = managerList[i].id;
+            mgrChoices.push(tmpObj);
+        }
+
+        // console.log(mgrChoices);
+
+        let empList = await inquirer.prompt([
+            {
+                name: "manager_id",
+                type: "list",
+                message: "Select manager: ",
+                choices: mgrChoices
+            }
+        ]);
+
+        // console.log(empList);
+        let results = await myDB.getEmpByMgr(empList);
+
+        console.table(results);
+        
+    } catch (error) {
+        console.log(error);
+        
+    }
 }
 
 // RUN

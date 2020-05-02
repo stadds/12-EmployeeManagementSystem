@@ -217,6 +217,59 @@ async function deleteEmployee(deleteEmp){
     }
 }
 
+
+async function getManagerList(){
+    try {
+
+        let query = `WITH emp_list (id,fname,lname,role,manager,title) AS (
+            SELECT
+                emp.id
+                , emp.first_name
+                , emp.last_name
+                , emp.role_id 
+                , emp.manager_id
+                , er.title
+            FROM employee emp
+                LEFT JOIN emp_role er on er.id = emp.role_id
+        )
+        SELECT DISTINCT
+            mgr.id
+            , CONCAT(mgr.fname," ",mgr.lname) AS "Manager"
+            , mgr.title
+            , COUNT(emp.id) as "Num_DirectReports"
+        FROM emp_list emp
+            INNER JOIN emp_list mgr ON mgr.id = emp.manager
+        GROUP BY mgr.id,  CONCAT(mgr.fname," ",mgr.lname);`
+
+        let results = await promisePool.query(query);
+
+        return results[0];
+        
+    } catch (error) {
+        console.log(error);
+        
+    }
+}
+
+async function getEmpByMgr(empManager){
+    try {
+
+        let query = 'SELECT emp.id, concat(first_name, " ", last_name) as Employee, er.title';
+        query += ' FROM employee emp INNER JOIN emp_role er on er.id = emp.role_id';
+        query += ' WHERE emp.manager_id = ? ORDER BY emp.id';
+
+        let results = await await promisePool.query(query,empManager.manager_id);
+
+        return results[0];
+
+        
+    } catch (error) {
+        console.log(error);
+        
+    }
+}
+
+
 // CLOSE POOL
 // =============================================================
 function closeDB() {
@@ -245,5 +298,7 @@ module.exports = {
     getAllDeptUtilBudget,
     getOneDeptBudget,
     deleteEmployee,
+    getManagerList,
+    getEmpByMgr,
     closeDB
 };

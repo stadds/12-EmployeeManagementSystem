@@ -113,7 +113,7 @@ WITH emp_list (id,fname,lname,role,manager,title) AS (
 SELECT 
 	CONCAT(mgr.fname," ",mgr.lname) AS "Manager"
     , mgr.title as "Manager Title"
-    , CONCAT(emp.fname," ",emp.lname) as "Employee"
+    , CONCAT(emp.fname," ",emp.lname) as "Direct Reports"
     , emp.title as "Employee Title"
 FROM emp_list emp
 	INNER JOIN emp_list mgr ON mgr.id = emp.manager;
