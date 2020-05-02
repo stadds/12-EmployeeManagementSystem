@@ -6,6 +6,17 @@ const myDB = require("./db");
 
 // Inqurier Prompts
 // =============================================================
+
+// const EMS_USER = {};
+
+const loginPrompt = [
+    {
+        name: "username",
+        type: "input",
+        message: "Please enter your username"
+    }
+];
+
 const starterPrompt = [
     {
         name: "actionitem",
@@ -89,10 +100,34 @@ const starterPrompt = [
     },
 ]
 
+// Get User Name
+// =============================================================
+async function getEMSUser(){
+    try {
+
+        let login = await inquirer.prompt(loginPrompt);
+
+        // EMS_USER.username = login.username;
+
+        // console.log(EMS_USER);
+
+        let result = await myDB.setDBUser(login);
+
+        console.log(result);
+        
+    } catch (error) {
+        console.log(error);
+        
+    }
+}
+
+
 // Get User Input
 // =============================================================
 async function getUserInput() {
     try {
+
+        await getEMSUser();
 
         let keepGoing = true;
 
@@ -102,7 +137,7 @@ async function getUserInput() {
 
             switch (getAction.actionitem) {
                 case ("exit"):
-                    console.log(getAction.actionitem);
+                    // console.log(getAction.actionitem);
                     keepGoing = false;
                     myDB.closeDB();
                     break;
@@ -116,6 +151,8 @@ async function getUserInput() {
                         }
                     ]);
                     // console.log(newDept);
+                    // newDept.created_by = EMS_USER.username;
+                    // newDept.updated_by = EMS_USER.username;
                     let result = await myDB.insertNewDept(newDept);
                     console.log(result);
                     break;

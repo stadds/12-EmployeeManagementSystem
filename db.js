@@ -17,6 +17,24 @@ const pool = mysql.createPool({
 
 const promisePool = pool.promise();
 
+const DB_USER = {}
+
+async function setDBUser(user) {
+    try {
+
+        DB_USER.created_by = user.username;
+        DB_USER.updated_by = user.username;
+
+        console.log(DB_USER);
+
+        return "\nlogin succesful!\n"
+
+
+    } catch (error) {
+        console.log(error);
+
+    }
+}
 
 // DEPARTMENT QUERIES
 // =============================================================
@@ -38,13 +56,12 @@ async function insertNewDept(newDept) {
     try {
 
         let query = `INSERT INTO department SET ?`;
-        await promisePool.query(query, newDept);
+        await promisePool.query(query, { ...DB_USER, ...newDept });
 
         return "\nNew deptartment successfully created. . . .\n";
 
     } catch (error) {
         console.log(error);
-
     }
 }
 
@@ -132,7 +149,7 @@ async function insertNewRole(roleParams) {
 
         let query = `INSERT INTO emp_role SET ?`;
 
-        await promisePool.query(query, roleParams);
+        await promisePool.query(query, { ...DB_USER, ...roleParams });
 
         return "\nNew role successfully created. . . .\n";
 
@@ -210,7 +227,7 @@ async function getRoleEmpCount() {
         // console.log(results);
         // console.log(results[0]);
 
-         return results[0];
+        return results[0];
 
     } catch (error) {
         console.log(error);
@@ -218,34 +235,47 @@ async function getRoleEmpCount() {
     }
 }
 
-async function updateRoleDept(roleDept){
+async function updateRoleDept(roleDept) {
     try {
 
-        let query = "UPDATE emp_role SET department_id = ? WHERE id = ?";
+        let query = "UPDATE emp_role SET ? WHERE id = ?";
 
-        await promisePool.query(query,[roleDept.department_id,roleDept.id]);
+        await promisePool.query(query, [
+            {
+                department_id: roleDept.department_id,
+                updated_by: DB_USER.updated_by
+            }
+            , roleDept.id
+        ]);
 
-        return "\nrole's department successfully updated. . . .\n";  
-        
+        return "\nrole's department successfully updated. . . .\n";
+
     } catch (error) {
-        console.log(error);        
+        console.log(error);
     }
 
 }
 
 
-async function updateRoleSalary(roleSal){
+async function updateRoleSalary(roleSal) {
     try {
 
         let query = "UPDATE emp_role SET salary = ? WHERE id = ?";
 
-        await promisePool.query(query,[roleSal.salary,roleSal.id]);
+        await promisePool.query(query,
+            [
+                {
+                    salary: roleSal.salary,
+                    updated_by: DB_USER.updated_by
+                }
+                , roleSal.id
+            ]);
 
         return "\nrole's salary successfully updated. . . .\n"
-        
+
     } catch (error) {
         console.log(error);
-        
+
     }
 
 }
@@ -287,7 +317,7 @@ async function getEmployeeList() {
 
 async function getEmployeeByDept(deptID) {
     try {
-        let query = 'SELECT emp.id, concat(first_name, " ", last_name) as Employee, er.title';
+        let query = 'SELECT emp.id, concat(first_name, " ", last_name) as Employee, emp.role_id, er.title';
         query += ' FROM employee emp INNER JOIN emp_role er on er.id = emp.role_id';
         query += ' WHERE er.department_id = ? ORDER BY er.id,emp.id';
 
@@ -305,7 +335,7 @@ async function insertNewEmp(newEmp) {
     try {
 
         let query = 'INSERT INTO employee SET ?';
-        await promisePool.query(query, newEmp);
+        await promisePool.query(query, { ...DB_USER, ...newEmp });
 
         return "\nNew employee successfully created. . . .\n";
 
@@ -323,7 +353,8 @@ async function updateEmpRoleMgr(empRole) {
             [
                 {
                     role_id: empRole.role_id,
-                    manager_id: empRole.manager_id
+                    manager_id: empRole.manager_id,
+                    updated_by: DB_USER.updated_by
                 },
                 {
                     id: empRole.id
@@ -388,6 +419,7 @@ function closeDB() {
 // init();
 
 module.exports = {
+    setDBUser,
     getAllEmployeeData,
     getEmployeeList,
     getEmployeeByDept,

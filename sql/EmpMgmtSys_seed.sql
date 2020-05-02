@@ -1,25 +1,27 @@
 USE employee_mgmtDB;
 
-INSERT INTO department(name)
-VALUES ("Marketing"),("Technology"),("Finance"),("Legal"),("Operations");
+SET @user = "sys_setup";
+
+INSERT INTO department(name,created_by, updated_by)
+VALUES ("Marketing",@user,@user),("Technology",@user,@user),("Finance",@user,@user),("Legal",@user,@user),("Operations",@user,@user);
 
 SELECT * FROM department;
 
-INSERT INTO emp_role(title,salary,department_id)
+INSERT INTO emp_role(title,salary,department_id,created_by, updated_by)
 VALUES 
-("Marketing Specialist",50000.00,1),
-("Marketing Lead",85000.00,1),
-("Product Manager",100000.00,1),
-("Software Engineer",60000.00,2),
-("Senior Software Engineer",85000.00,2),
-("Lead Engineer",110000.00,2),
-("Accounts Payable Analyst",55000.00,3),
-("Accounts Receivable Analyst",55000.00,3),
-("Accounts Lead",80000.00,3),
-("Corporate Associate Attorney",80000.00,4),
-("Senior Corporate Counsel",180000.00,4),
-("Operations Analyst",50000.00,5),
-("Operations Manager",90000.00,5);
+("Marketing Specialist",50000.00,1,@user,@user),
+("Marketing Lead",85000.00,1,@user,@user),
+("Product Manager",100000.00,1,@user,@user),
+("Software Engineer",60000.00,2,@user,@user),
+("Senior Software Engineer",85000.00,2,@user,@user),
+("Lead Engineer",110000.00,2,@user,@user),
+("Accounts Payable Analyst",55000.00,3,@user,@user),
+("Accounts Receivable Analyst",55000.00,3,@user,@user),
+("Accounts Lead",80000.00,3,@user,@user),
+("Corporate Associate Attorney",80000.00,4,@user,@user),
+("Senior Corporate Counsel",180000.00,4,@user,@user),
+("Operations Analyst",50000.00,5,@user,@user),
+("Operations Manager",90000.00,5,@user,@user);
 
 SELECT * FROM emp_role;
 
@@ -33,24 +35,24 @@ FROM department d
 	INNER JOIN emp_role er on er.department_id = d.id
 ORDER BY d.id, er.salary ASC;
 
-INSERT INTO employee(first_name, last_name,role_id)
+INSERT INTO employee(first_name, last_name,role_id,created_by, updated_by)
 VALUES
-("Boyd","Hume",1),
-("Elise","Warrick",2),
-("Remi","Borde",3),
-("Sudarshana","Miyamoto",4),
-("Kalyan","Lynton",4),
-("Nikolas","Bates",5),
-("Mohini","Hatheway",6),
-("Tye","Sasaki",7),
-("Dillon","Hardwick",8),
-("Yuna","Tailor",8),
-("Zara","Claesson",9),
-("Maya","Barlow",10),
-("Hikaru","Bishop",11),
-("Sushil","Vemulakonda",12),
-("Ayame","Fay",12),
-("Lara","Croft",13);
+("Boyd","Hume",1,@user,@user),
+("Elise","Warrick",2,@user,@user),
+("Remi","Borde",3,@user,@user),
+("Sudarshana","Miyamoto",4,@user,@user),
+("Kalyan","Lynton",4,@user,@user),
+("Nikolas","Bates",5,@user,@user),
+("Mohini","Hatheway",6,@user,@user),
+("Tye","Sasaki",7,@user,@user),
+("Dillon","Hardwick",8,@user,@user),
+("Yuna","Tailor",8,@user,@user),
+("Zara","Claesson",9,@user,@user),
+("Maya","Barlow",10,@user,@user),
+("Hikaru","Bishop",11,@user,@user),
+("Sushil","Vemulakonda",12,@user,@user),
+("Ayame","Fay",12,@user,@user),
+("Lara","Croft",13,@user,@user);
 
 SELECT * FROM employee;
 
