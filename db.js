@@ -260,7 +260,7 @@ async function updateRoleDept(roleDept) {
 async function updateRoleSalary(roleSal) {
     try {
 
-        let query = "UPDATE emp_role SET salary = ? WHERE id = ?";
+        let query = "UPDATE emp_role SET ? WHERE id = ?";
 
         await promisePool.query(query,
             [
