@@ -143,6 +143,7 @@ async function getUserInput() {
                     break;
 
                 case ("updateRoleSalary"):
+                    await updateRoleSalary();
                     break;
 
                 case ("updateRoleDept"):
@@ -774,6 +775,16 @@ async function updateRoleSalary() {
 
         console.log(roleSalary);
 
+        let result = "";
+
+        if(roleSalary.confirm === "Yes"){
+            result = await myDB.updateRoleSalary(roleSalary);
+        }
+        else{
+            result = "\ncancelling update role's salary. . . .\n";
+        }
+
+        console.log(result);
 
     } catch (error) {
         console.log(error);
