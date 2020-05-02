@@ -502,7 +502,7 @@ async function getOneDeptBudget() {
             }
         ]);
 
-        console.log(dept.id)
+        // console.log(dept.id)
 
         let deptBudget = await myDB.getOneDeptBudget(dept.id);
 
@@ -539,7 +539,7 @@ async function deleteEmployee() {
             }
         ]);
 
-        console.log(deleteEmp);
+        // console.log(deleteEmp);
 
 
         let result = await myDB.deleteEmployee(deleteEmp);
@@ -745,7 +745,7 @@ async function updateRoleDept() {
             }
         ]);
 
-        console.log(roleDept);
+        // console.log(roleDept);
 
         let result = "";
 
@@ -810,7 +810,7 @@ async function updateRoleSalary() {
             }
         ]);
 
-        console.log(roleSalary);
+        // console.log(roleSalary);
 
         let result = "";
 

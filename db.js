@@ -25,7 +25,7 @@ async function setDBUser(user) {
         DB_USER.created_by = user.username;
         DB_USER.updated_by = user.username;
 
-        console.log(DB_USER);
+        // console.log(DB_USER);
 
         return "\nlogin succesful!\n"
 
