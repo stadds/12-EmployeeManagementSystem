@@ -40,7 +40,7 @@ async function insertNewDept(newDept) {
         let query = `INSERT INTO department SET ?`;
         await promisePool.query(query, newDept);
 
-        return "New deptartment successfully created";
+        return "\nNew deptartment successfully created. . . .\n";
 
     } catch (error) {
         console.log(error);
@@ -99,7 +99,9 @@ async function getAllRoles() {
         let query = 'SELECT er.id, d.name as department, er.department_id, er.title, FORMAT(er.salary,2) as salary ';
         query += ' FROM emp_role er LEFT JOIN department d ON d.id = er.department_id ';
         query += ' ORDER BY er.department_id, er.id ASC ';
+
         let results = await promisePool.query(query);
+
         return results[0];
 
     } catch (error) {
@@ -112,9 +114,11 @@ async function insertNewRole(roleParams) {
     try {
 
         let query = `INSERT INTO emp_role SET ?`;
+
         await promisePool.query(query, roleParams);
 
-        return "New role successfully created";
+        return "\nNew role successfully created. . . .\n";
+
     } catch (error) {
         console.log(error);
 
@@ -132,7 +136,9 @@ async function getAllEmployeeData() {
 
         let results = await promisePool.query(query);
         // console.table(results[0]);   
+
         return results[0];
+
     } catch (error) {
         console.log(error);
     }
@@ -144,7 +150,9 @@ async function getEmployeeList() {
         query += ' FROM employee emp LEFT JOIN emp_role er on er.id = emp.role_id ORDER BY emp.id';
 
         let results = await promisePool.query(query);
+
         return results[0];
+
     } catch (error) {
         console.log(error);
 
@@ -173,7 +181,7 @@ async function insertNewEmp(newEmp) {
         let query = 'INSERT INTO employee SET ?';
         await promisePool.query(query, newEmp);
 
-        return "New employee created";
+        return "\nNew employee successfully created. . . .\n";
 
     } catch (error) {
         console.log(error);
@@ -318,12 +326,44 @@ async function getRoleEmpCount() {
 
          return results[0];
 
-
     } catch (error) {
         console.log(error);
 
     }
 }
+
+async function updateRoleDept(roleDept){
+    try {
+
+        let query = "UPDATE emp_role SET department_id = ? WHERE id = ?";
+
+        await promisePool.query(query,[roleDept.deptartnemt_id,roleDept.id]);
+
+        return "\nrole's department successfully updated. . . .\n";  
+        
+    } catch (error) {
+        console.log(error);        
+    }
+
+}
+
+
+async function updateRoleSalary(roleSal){
+    try {
+
+        let query = "UPDATE emp_role SET salary = ? WHERE id = ?";
+
+        await promisePool.query(query,[roleSal.salary,roleSal.id]);
+
+        return "\nrole's salary successfully updated. . . .\n"
+        
+    } catch (error) {
+        console.log(error);
+        
+    }
+
+}
+
 
 
 // CLOSE POOL
@@ -359,5 +399,7 @@ module.exports = {
     deleteRole,
     deleteDept,
     getRoleEmpCount,
+    updateRoleSalary,
+    updateRoleDept,
     closeDB
 };

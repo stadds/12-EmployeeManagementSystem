@@ -145,3 +145,7 @@ SELECT * FROM emp_role;
 DELETE FROM emp_role WHERE ID = 3;
 
 DELETE FROM deptartment WHERE ID = ?;
+
+UPDATE emp_role SET department_id = ? WHERE id = ?
+
+UPDATE emp_role SET salary = ? WHERE id = ?
