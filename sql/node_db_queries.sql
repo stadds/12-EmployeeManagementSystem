@@ -98,7 +98,7 @@ FROM employee emp
 WHERE er.department_id = 3
 ORDER BY emp.id;
 ;
--- Get Employee by Manager
+-- Get Manager, Count of Direct Reports
 WITH emp_list (id,fname,lname,role,manager,title) AS (
 	SELECT
 		emp.id
@@ -110,10 +110,27 @@ WITH emp_list (id,fname,lname,role,manager,title) AS (
 	FROM employee emp
 		LEFT JOIN emp_role er on er.id = emp.role_id
 )
-SELECT 
-	CONCAT(mgr.fname," ",mgr.lname) AS "Manager"
-    , mgr.title as "Manager Title"
-    , CONCAT(emp.fname," ",emp.lname) as "Direct Reports"
-    , emp.title as "Employee Title"
+SELECT DISTINCT
+	mgr.id
+	, CONCAT(mgr.fname," ",mgr.lname) AS "Manager"
+    , mgr.title
+    , COUNT(emp.id) as "# Direct Reports"
 FROM emp_list emp
-	INNER JOIN emp_list mgr ON mgr.id = emp.manager;
+	INNER JOIN emp_list mgr ON mgr.id = emp.manager
+GROUP BY mgr.id,  CONCAT(mgr.fname," ",mgr.lname);
+
+
+-- Get Employee by Manager
+SELECT 
+	emp.id
+    ,concat(first_name, " ", last_name) as Employee
+    ,er.title
+FROM employee emp
+	INNER JOIN emp_role er on er.id = emp.role_id
+WHERE emp.manager_id = 11
+ORDER BY emp.id;
+
+
+DELETE FROM emp_role WHERE ID = ?;
+
+DELETE FROM deptartment WHERE ID = ?;

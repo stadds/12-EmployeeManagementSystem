@@ -269,6 +269,36 @@ async function getEmpByMgr(empManager){
     }
 }
 
+async function deleteRole(delRole){
+    try {
+
+        let query = 'DELETE FROM emp_role WHERE ID = ?';
+
+        await promisePool.query(query,delRole.id);
+
+        return "\nrole successfully deleted. . . .\n";
+        
+    } catch (error) {
+        console.log(error);
+        
+    }
+}
+
+async function deleteDept(delDept){
+    try {
+
+        let query = 'DELETE FROM department WHERE ID = ?';
+
+        await promisePool.query(query,delDept.id);
+
+        return "\ndepartment successfully deleted. . . .\n";
+        
+    } catch (error) {
+        console.log(error);
+        
+    }
+}
+
 
 // CLOSE POOL
 // =============================================================
