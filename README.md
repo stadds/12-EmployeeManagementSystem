@@ -32,7 +32,7 @@ SO THAT i can organize and plan my business
 2. run the schema.sql file to setup the database in your mysql server
 3. run the seed.sql to add some values to the tables
 4. Create a new file in the same folder as the app.js file and name it ".env"
-5. add the following variables in the file: 
+5. Add the following variables in the .env file: 
 ```
 MYSQL_DATABASE = employee_mgmtDB
 MYSQL_HOST = localhost
