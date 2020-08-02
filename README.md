@@ -31,7 +31,14 @@ SO THAT i can organize and plan my business
 1. run "npm install" to install the required dependencies
 2. run the schema.sql file to setup the database in your mysql server
 3. run the seed.sql to add some values to the tables
-4. update the .env file for your mysql database port, user, and password
+4. Create a new file in the same folder as the app.js file and name it ".env"
+5. add the following variables in the file: 
+MYSQL_DATABASE = employee_mgmtDB
+MYSQL_HOST = localhost
+MYSQL_PORT = UPDATE_THIS
+MYSQL_USER = UPDATE_THIS
+MYSQL_PASSWORD = UPDATE_THIS
+6. Where it says UPDATE_THIS for the above variables in the .env file, update them to your own mysql database port, username, and password
 
 ---
 ## Usage
